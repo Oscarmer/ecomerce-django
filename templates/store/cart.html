@@ -1,0 +1,144 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block content %}
+<section class="section-content padding-y bg">
+  <div class="container">
+    <!-- ============================ COMPONENT 1 ================================= -->
+    {% if quantity > 0 %}
+    <div class="row">
+      <aside class="col-lg-9">
+        <div class="card">
+            <table class="table table-borderless table-shopping-cart">
+              <thead class="text-muted">
+                <tr class="small text-uppercase">
+                  <th scope="col">Product</th>
+                  <th scope="col" width="120">Cantidad</th>
+                  <th scope="col" width="120">Precio</th>
+                  <th scope="col" class="text-right" width="200"></th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for item in cart_items %}
+                      <tr>
+                          <td>
+                          <figure class="itemside align-items-center">
+                              <div class="aside">
+                              <a href="{{item.product.get_url}}"><img src="{{item.product.images.url}}" class="img-sm" /></a>
+                              </div>
+                              <figcaption class="info">
+                              <a href="{{item.product.get_url}}" class="title text-dark">{{item.product.product_name}}</a>
+                              <p class="text-muted small">
+                                {% if item.variations.all %}
+                                  {% for it in item.variations.all %}
+                                    {{it.variation_category | capfirst}} : {{it.variation_value| capfirst}}
+                                    <br>
+                                  {% endfor %}
+                                {% endif %}
+                              </p>
+                              </figcaption>
+                          </figure>
+                          </td>
+                          <td>
+                          <!-- col.// -->
+                          <div class="col">
+                            <div class="input-group input-spinner">
+                              <div class="input-group-prepend">
+                                  <a href="{% url 'remove_cart' item.product.id item.id %}"
+                                    class="btn btn-light"
+                                    type="button"
+                                    id="button-plus"
+                                    >
+                                    <i class="fa fa-minus"></i>
+                                  </a>
+                              </div>
+                              <input type="text" class="form-control" value="{{item.quantity}}" />
+                              <div class="input-group-append">
+                                <form action="{% url 'add_cart' item.product.id %}" method="post">
+                                  {% csrf_token %}
+                                  {% for it in item.variations.all %}
+                                    <input type="hidden" name="{{it.variation_category | lower}}" value="{{it.variation_value | capfirst}}">
+                                  {% endfor %}
+                                  <button 
+                                    class="btn btn-light"
+                                    type="submit"
+                                    id="button-minus" 
+                                    >
+                                    <i class="fa fa-plus"></i>
+                                  </button>
+                                </form>
+                              </div>
+                            </div>
+                              <!-- input-group.// -->
+                          </div>
+                          <!-- col.// -->
+                          </td>
+                          <td>
+                          <div class="price-wrap">
+                              <var class="price"> ${{item.sub_total}} </var>
+                              <small class="text-muted"> ${{item.product.price}} cada uno </small>
+                          </div>
+                          <!-- price-wrap .// -->
+                          </td>
+                          <td class="text-right">
+                          <a href="{% url 'delete_item' item.product.id item.id %}" class="btn btn-danger"> Eliminar</a>
+                          </td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+        </div>
+        <!-- card.// -->
+      </aside>
+      <!-- col.// -->
+      <aside class="col-lg-3">
+        <div class="card">
+          <div class="card-body">
+            <dl class="dlist-align">
+              <dt>Total price:</dt>
+              <dd class="text-right">${{total}}</dd>
+            </dl>
+            <dl class="dlist-align">
+              <dt>Iva:</dt>
+              <dd class="text-right">${{iva}}</dd>
+            </dl>
+            <dl class="dlist-align">
+              <dt>Total:</dt>
+              <dd class="text-right text-dark b"><strong>${{grand_total}}</strong></dd>
+            </dl>
+            <hr />
+            <p class="text-center mb-3">
+              <img src="{% static './images/misc/payments.png' %}" height="26" />
+            </p>
+            <a href="{% url 'checkout' %}" class="btn btn-primary btn-block">
+              Pagar
+            </a>
+            <a href="{% url 'store' %}" class="btn btn-light btn-block"
+              >Continua comprando</a
+            >
+          </div>
+          <!-- card-body.// -->
+        </div>
+        <!-- card.// -->
+      </aside>
+      <!-- col.// -->
+    </div>
+    {% else %}
+      <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="info-fill" viewBox="0 0 16 16">
+          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+        </symbol>
+      </svg>
+      <div class="alert alert-primary text-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:" width='80' ><use xlink:href="#info-fill"/></svg>
+        <h2 class="alert-heading">No hay productos en el carrito</h2>
+        <hr>
+        <p class="mb-0"><a href="{% url 'store' %}" class='btn btn-success'>Comprar</a></p>
+      </div>
+    {% endif %}
+    <!-- row.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+  </div>
+  <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+{% endblock content %}
